@@ -3,7 +3,6 @@ import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { LayoutDashboard, Users, Calendar, Clock, AlertTriangle, Search, ChevronDown, Download, Filter, MessageSquare, Briefcase, TrendingUp, X, MapPin, Phone, Mail, User, Info, Loader2 } from 'lucide-react';
 import { getDisplayableImageUrl } from '../../utils/imageUtils';
 import {
-  employees,
   getTopScorers,
   getLowestScorers,
   getEmployeesByPendingTasks,
@@ -56,13 +55,15 @@ const AdminDashboard = () => {
   const [columnLabels, setColumnLabels] = useState({
     name: "Name",
     designation: "Designation",
-    target: "Target",
-    actualWork: "Actual Work",
-    weeklyDone: "Weekly Not Done %",
-    weeklyOnTime: "Weekly On Time Not Done %",
-    totalWork: "Total Work",
-    weekPending: "Week Pending",
-    allPending: "All Pending"
+    target: "Current Week Planned",
+    actualWork: "Current Week Actual",
+    weeklyDone: "Curent Week Actual %",
+    weeklyOnTime: "% Work Not Done",
+    totalWork: "Work Not Done On Time %",
+    weekPending: "All Pending Till Week End",
+    allPending: "Work Not Done",
+    workDoneOnTime: "Work Done On Time",
+    workNotDoneOnTime: "Work Not Done On Time",
   });
 
   // Column Visibility State
@@ -77,6 +78,8 @@ const AdminDashboard = () => {
     { key: "totalWork", label: columnLabels.totalWork },
     { key: "weekPending", label: columnLabels.weekPending },
     { key: "allPending", label: columnLabels.allPending },
+    { key: "workDoneOnTime", label: columnLabels.workDoneOnTime },
+    { key: "workNotDoneOnTime", label: columnLabels.workNotDoneOnTime },
     { key: "lastWeekPlannedNotDone", label: "Last Week Planned Work Not Done %" },
     { key: "lastWeekPlannedNotDoneOnTime", label: "Last Week Planned Work Not Done On Time %" },
     { key: "lastWeekCommitment", label: "Last Week Commitment" },
@@ -198,18 +201,20 @@ const AdminDashboard = () => {
         const scriptUrl = import.meta.env.VITE_APPS_SCRIPT_URL;
         if (!scriptUrl) {
           console.error("VITE_APPS_SCRIPT_URL not set");
-          setSheetEmployees(employees);
           setLoading(false);
           return;
         }
 
         // Fetch sheets
+        const getSheetUrl = (sheetName) => import.meta.env.DEV
+          ? `/apps-script?sheet=${encodeURIComponent(sheetName)}`
+          : `${scriptUrl}?sheet=${encodeURIComponent(sheetName)}`;
         const [recordsResponse, archivedResponse, masterResponse, dataResponse, deptScoreResponse] = await Promise.all([
-          fetch(`${scriptUrl}?sheet=For Records`),
-          fetch(`${scriptUrl}?sheet=Archived`),
-          fetch(`${scriptUrl}?sheet=Master`),
-          fetch(`${scriptUrl}?sheet=Data`),
-          fetch(`${scriptUrl}?sheet=Department Score Graph`)
+          fetch(getSheetUrl("For Records")),
+          fetch(getSheetUrl("Archived")),
+          fetch(getSheetUrl("Master")),
+          fetch(getSheetUrl("Data")),
+          fetch(getSheetUrl("Department Score Graph"))
         ]);
 
         const result = await recordsResponse.json();
@@ -323,13 +328,15 @@ const AdminDashboard = () => {
               ...prev,
               name: headers[2] || prev.name,
               designation: headers[3] || prev.designation,
-              target: headers[3] || prev.target,
-              actualWork: headers[4] || prev.actualWork,
-              weeklyDone: "% Weekly Not Done",
-              weeklyOnTime: "Weekly On Time Not Done %",
-              totalWork: headers[7] || prev.totalWork,
-              weekPending: headers[8] || prev.weekPending,
-              allPending: headers[9] || prev.allPending
+              target: "Current Week Planned",
+              actualWork: "Current Week Actual",
+              weeklyDone: "Curent Week Actual %",
+              weeklyOnTime: "% Work Not Done",
+              totalWork: "Work Not Done On Time %",
+              weekPending: "All Pending Till Week End",
+              allPending: "Work Not Done",
+              workDoneOnTime: "Work Done On Time",
+              workNotDoneOnTime: "Work Not Done On Time"
             }));
           }
 
@@ -352,8 +359,8 @@ const AdminDashboard = () => {
               return {
                 id: randomId,
                 name: empName,
-                startDate: row[10] || "", // Column K (index 10)
-                endDate: row[11] || "",   // Column L (index 11)
+                startDate: row[12] || "", // Column M (index 12)
+                endDate: row[13] || "",   // Column N (index 13)
                 designation: designationMap[normalizedName] || "",
                 department: "",
                 image: finalImageUrl,
@@ -366,14 +373,16 @@ const AdminDashboard = () => {
                 totalWorkDone: row[7] || 0,
                 weekPending: row[8] || 0,
                 allPendingTillDate: row[9] || 0,
+                workDoneOnTime: row[10] || 0,
+                workNotDoneOnTime: row[11] || 0,
 
-                plannedWorkNotDone: row[12] || 0,
-                plannedWorkNotDoneOnTime: row[13] || 0,
-                commitment: row[14] || 0,
+                plannedWorkNotDone: row[14] || 0,
+                plannedWorkNotDoneOnTime: row[15] || 0,
+                commitment: row[16] || 0,
 
-                nextWeekPlannedWorkNotDone: row[16] || 0,
-                nextWeekPlannedWorkNotDoneOnTime: row[17] || 0,
-                nextWeekCommitment: row[18] || 0
+                nextWeekPlannedWorkNotDone: row[18] || 0,
+                nextWeekPlannedWorkNotDoneOnTime: row[19] || 0,
+                nextWeekCommitment: row[20] || 0
               };
             });
 
@@ -399,11 +408,9 @@ const AdminDashboard = () => {
           setSheetEmployees(finalData);
         } else {
           console.error("Failed to load sheet data", result);
-          setSheetEmployees(employees);
         }
       } catch (error) {
         console.error("Error fetching sheet data:", error);
-        setSheetEmployees(employees);
       } finally {
         setLoading(false);
       }

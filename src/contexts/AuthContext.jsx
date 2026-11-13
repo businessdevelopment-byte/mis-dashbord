@@ -4,6 +4,10 @@ import { getDisplayableImageUrl } from '../utils/imageUtils';
 
 const AuthContext = createContext(undefined);
 
+const getMasterSheetUrl = (scriptUrl) => (
+  import.meta.env.DEV ? '/apps-script?sheet=Master' : `${scriptUrl}?sheet=Master`
+);
+
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -26,7 +30,7 @@ export function AuthProvider({ children }) {
     try {
       const scriptUrl = import.meta.env.VITE_APPS_SCRIPT_URL;
       if (scriptUrl) {
-        const response = await fetch(`${scriptUrl}?sheet=Master`);
+        const response = await fetch(getMasterSheetUrl(scriptUrl));
         const result = await response.json();
         if (result.success && Array.isArray(result.data)) {
           setUserCache(result.data);
@@ -101,12 +105,18 @@ export function AuthProvider({ children }) {
           return false;
         }
         // Fetch users (Master tab)
-        const response = await fetch(`${scriptUrl}?sheet=Master`);
-        const result = await response.json();
-        if (result.success && Array.isArray(result.data)) {
-          usersData = result.data;
-          setUserCache(usersData); // Cache for next time
+        const response = await fetch(getMasterSheetUrl(scriptUrl));
+        let result;
+        try {
+          result = await response.json();
+        } catch {
+          throw new Error('Authentication service returned an invalid response.');
         }
+        if (!response.ok || !result.success || !Array.isArray(result.data)) {
+          throw new Error('Authentication service could not load user data.');
+        }
+        usersData = result.data;
+        setUserCache(usersData); // Cache for next time
       }
 
       if (usersData) {
@@ -167,10 +177,12 @@ export function AuthProvider({ children }) {
       }
     } catch (error) {
       console.error("Authentication error:", error);
+      throw new Error('Unable to contact the authentication service. Please try again later.');
+    } finally {
+      setLoading(false);
     }
 
     // If we get here, login failed
-    setLoading(false);
     return false;
   };
 

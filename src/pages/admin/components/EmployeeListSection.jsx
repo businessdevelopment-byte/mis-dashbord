@@ -227,6 +227,16 @@ const EmployeeListSection = ({
                                     {columnLabels.allPending}
                                 </th>
                             )}
+                            {visibleColumns.workDoneOnTime && (
+                                <th className="px-2 min-w-24 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    {columnLabels.workDoneOnTime}
+                                </th>
+                            )}
+                            {visibleColumns.workNotDoneOnTime && (
+                                <th className="px-2 min-w-24 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    {columnLabels.workNotDoneOnTime}
+                                </th>
+                            )}
                             {visibleColumns.lastWeekPlannedNotDone && (
                                 <th className="px-2 min-w-24 text-center py-3  text-xs font-bold uppercase tracking-wider bg-red-100 text-red-700">
                                     Planned % Work Not Done
@@ -368,6 +378,16 @@ const EmployeeListSection = ({
                                         {visibleColumns.allPending && (
                                             <td className="px-3 py-4 whitespace-nowrap text-sm text-gray-900 text-center">
                                                 {employee.allPendingTillDate}
+                                            </td>
+                                        )}
+                                        {visibleColumns.workDoneOnTime && (
+                                            <td className="px-3 py-4 whitespace-nowrap text-sm text-gray-900 text-center">
+                                                {employee.workDoneOnTime}
+                                            </td>
+                                        )}
+                                        {visibleColumns.workNotDoneOnTime && (
+                                            <td className="px-3 py-4 whitespace-nowrap text-sm text-gray-900 text-center">
+                                                {employee.workNotDoneOnTime}
                                             </td>
                                         )}
                                         {visibleColumns.lastWeekPlannedNotDone && (
@@ -581,6 +601,18 @@ const EmployeeListSection = ({
                                                 <p className="text-gray-500">All Pending</p>
                                                 <p className="font-semibold text-gray-900">
                                                     {employee.allPendingTillDate}
+                                                </p>
+                                            </div>
+                                            <div className="bg-gray-50 p-2 rounded">
+                                                <p className="text-gray-500">Work Done On Time</p>
+                                                <p className="font-semibold text-gray-900">
+                                                    {employee.workDoneOnTime}
+                                                </p>
+                                            </div>
+                                            <div className="bg-gray-50 p-2 rounded">
+                                                <p className="text-gray-500">Work Not Done On Time</p>
+                                                <p className="font-semibold text-gray-900">
+                                                    {employee.workNotDoneOnTime}
                                                 </p>
                                             </div>
                                         </div>

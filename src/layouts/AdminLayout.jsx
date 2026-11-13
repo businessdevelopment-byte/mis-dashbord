@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, Calendar, ClipboardList, LogOut, Menu, X, LineChart, History } from 'lucide-react';
+import { LayoutDashboard, Calendar, ClipboardList, LogOut, Menu, X, History } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import Footer from '../components/Footer';
 import { getDisplayableImageUrl } from '../utils/imageUtils';
@@ -241,17 +241,6 @@ const AdminLayout = () => {
                 <ClipboardList size={20} className="shrink-0" />
                 <span className="truncate">Pending Tasks</span>
               </Link> */}
-              <Link
-                to={(user?.role === 'admin' || user?.role === 'superadmin') ? "/admin/kpi-kra" : "/user/kpi-kra"}
-                className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 text-sm sm:text-base font-medium ${(isActive('/admin/kpi-kra') || isActive('/user/kpi-kra'))
-                    ? 'bg-blue-50 text-blue-600 border-r-4 border-blue-600'
-                    : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
-                  }`}
-                onClick={closeSidebar}
-              >
-                <LineChart size={20} className="shrink-0" />
-                <span className="truncate">KPI & KRA</span>
-              </Link>
             </nav>
           </div>
         </aside>
