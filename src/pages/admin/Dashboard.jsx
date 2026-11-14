@@ -670,9 +670,12 @@ const AdminDashboard = () => {
   const parseSheetRef = (ref) => {
     if (!ref) return null;
     const str = String(ref).trim();
-    const bangIndex = str.indexOf("!");
+    const bangIndex = str.lastIndexOf("!");
     if (bangIndex === -1) return { sheetName: str, colIndex: -1, startRowIndex: 0 };
-    const sheetName = str.substring(0, bangIndex);
+    let sheetName = str.substring(0, bangIndex).trim();
+    if (sheetName.startsWith("'") && sheetName.endsWith("'")) {
+      sheetName = sheetName.slice(1, -1).replace(/''/g, "'");
+    }
     const rangePart = str.substring(bangIndex + 1);
 
     const colMatch = rangePart.match(/^([A-Za-z]+)(\d*)/);
@@ -693,13 +696,6 @@ const AdminDashboard = () => {
 
   const handleDrillDown = async (task, type, value, event) => {
     event.stopPropagation();
-    if (value === 0) return;
-
-    const scriptUrl = String(task.scriptUrl || "").trim();
-    if (!scriptUrl) {
-      console.error("No App Script URL found in Data sheet Column Z for task:", task.taskName);
-      return;
-    }
 
     const plannedParsed = parseSheetRef(task.plannedSheetRef);
     const actualParsed = parseSheetRef(task.actualSheetRef);
@@ -718,6 +714,11 @@ const AdminDashboard = () => {
 
     try {
       const employeeName = String(selectedUserDetails?.name || "").trim();
+      const normalizeName = (name) => String(name || "")
+        .replace(/\u00a0/g, " ")
+        .trim()
+        .replace(/\s+/g, " ")
+        .toLocaleLowerCase();
 
       const sheetDataCache = {};
       const sheetsToFetch = new Set();
@@ -728,19 +729,21 @@ const AdminDashboard = () => {
       if (delayParsed?.sheetName) sheetsToFetch.add(delayParsed.sheetName);
 
       const fetchPromises = [...sheetsToFetch].map(async (name) => {
-        // Skip department-specific scriptUrl — it's CORS-blocked from localhost.
-        // Always use the global VITE_APPS_SCRIPT_URL with spreadsheetId directly.
-        const urlsToTry = [import.meta.env.VITE_APPS_SCRIPT_URL]
-          .map(u => String(u || "").trim())
-          .filter(u => u.startsWith("http"));
-        
+        const globalScriptUrl = String(import.meta.env.VITE_APPS_SCRIPT_URL || "").trim();
+        if (!globalScriptUrl) {
+          throw new Error("VITE_APPS_SCRIPT_URL is not configured.");
+        }
+
+        const urlsToTry = [globalScriptUrl];
         let success = false;
         for (const url of urlsToTry) {
           try {
-            const separator = url.includes('?') ? '&' : '?';
-            let fetchUrl = `${url}${separator}sheet=${encodeURIComponent(name)}`;
+            const fetchUrl = import.meta.env.DEV
+              ? new URL("/apps-script", window.location.origin)
+              : new URL(url);
+            fetchUrl.searchParams.set("sheet", name);
             if (task.sheetId) {
-              fetchUrl += `&spreadsheetId=${encodeURIComponent(task.sheetId)}`;
+              fetchUrl.searchParams.set("spreadsheetId", task.sheetId);
             }
             
             const res = await fetch(fetchUrl);
@@ -764,6 +767,7 @@ const AdminDashboard = () => {
       const formatDateValue = (val) => {
         if (val === undefined || val === null || val === "") return "";
         const str = String(val);
+        if (/^\d{1,2}[/-]\d{1,2}[/-]\d{4}(?:\s|$)/.test(str)) return str;
         const d = new Date(str);
         if (!isNaN(d.getTime()) && (str.includes("T") || str.includes("-") || str.includes("/"))) {
           const dd = String(d.getDate()).padStart(2, "0");
@@ -845,8 +849,8 @@ const AdminDashboard = () => {
 
         matchingRowIndices = [];
         nameRowsFromStart.forEach((row, idx) => {
-          const nameInSheet = row[nameParsed.colIndex] ? String(row[nameParsed.colIndex]).trim() : "";
-          if (nameInSheet === employeeName) {
+          const nameInSheet = normalizeName(row[nameParsed.colIndex]);
+          if (nameInSheet === normalizeName(employeeName)) {
             matchingRowIndices.push(idx);
           }
         });
@@ -870,6 +874,16 @@ const AdminDashboard = () => {
       const actualValues = getColumnValues(actualParsed);
       const taskNameValues = getColumnValues(taskNameParsed, (val) => (val === undefined || val === null) ? "" : String(val));
       const delayValues = getColumnValues(delayParsed, formatDurationValue);
+      const normalizedSummaryTaskName = normalizeName(task.taskName);
+      const normalizedEmployeeName = normalizeName(employeeName);
+      const summaryTaskName = normalizedEmployeeName && normalizedSummaryTaskName.endsWith(normalizedEmployeeName)
+        ? normalizedSummaryTaskName
+          .slice(0, -normalizedEmployeeName.length)
+          .replace(/[\s\-–—]+$/, "")
+        : normalizedSummaryTaskName;
+      const taskNameFilter = taskNameValues.some(
+        taskName => normalizeName(taskName) === summaryTaskName
+      ) ? summaryTaskName : null;
 
       const maxLen = Math.max(plannedValues.length, actualValues.length, taskNameValues.length);
       const rows = [];
@@ -924,6 +938,9 @@ const AdminDashboard = () => {
         const plannedVal = plannedValues[i] || "";
         const actualVal = actualValues[i] || "";
         const delayVal = delayValues[i] || "";
+        const detailTaskName = taskNameValues[i] || "";
+
+        if (taskNameFilter && normalizeName(detailTaskName) !== taskNameFilter) continue;
         
         // Include all rows that have at least a planned date
         if (plannedVal) {
@@ -937,7 +954,7 @@ const AdminDashboard = () => {
 
           if (inRange) {
             rows.push({
-              taskName: taskNameValues[i] || "",
+              taskName: detailTaskName,
               planned: plannedVal,
               actual: actualVal,
               delay: delayVal
