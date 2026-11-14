@@ -30,7 +30,7 @@ const defaultData = {
 const KpiKra = () => {
   const { user } = useAuth();
   const [selectedDesignation, setSelectedDesignation] = useState('All');
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false); 
   const [userDept, setUserDept] = useState(user?.department || '');
   const [userRole, setUserRole] = useState(user?.role || '');
 
