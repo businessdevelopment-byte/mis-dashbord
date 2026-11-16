@@ -1158,6 +1158,7 @@ CHANDHOK.`;
         pendingTasks={sortedPendingList}
         departmentScores={departmentScores}
         dataSheetRows={dataSheetRows}
+        dataSheetDateRange={dataSheetDateRange}
       />
 
       {/* Employee List */}
