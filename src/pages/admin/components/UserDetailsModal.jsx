@@ -283,7 +283,7 @@ const UserDetailsModal = ({
                     <div class="report-container">
                         <div class="report-header">
                             <div class="brand">
-                                <h1 class="brand-name">CHANDHOK COLD STORAGE</h1>
+                                <h1 class="brand-name">VSNAPU</h1>
                                 
                             </div>
                             <div class="report-title-box">
@@ -325,8 +325,6 @@ const UserDetailsModal = ({
                                     <th class="num-col">ACTUAL WORK DONE</th>
                                     <th class="num-col">WORK NOT DONE %</th>
                                     <th class="num-col">WORK NOT DONE ON TIME%</th>
-                                    <th class="num-col red-header">PLANNED % WORK NOT DONE</th>
-                                    <th class="num-col red-header">PLANNED % WORK NOT DONE ON TIME</th>
                                     <th class="num-col red-header">COMMITMENT</th>
                                 </tr>
                             </thead>
@@ -346,8 +344,6 @@ const UserDetailsModal = ({
                                         <td><span class="badge ${isTargetMet ? 'badge-green' : (achievement > 0 ? 'badge-blue' : 'badge-red')}">${task.totalAchievement}</span></td>
                                         <td>${formatPercent(task.workNotDone)}</td>
                                         <td>${formatPercent(task.workNotDoneOnTime)}</td>
-                                        <td class="red-col">${formatPercent(selectedUserDetails.plannedWorkNotDone)}</td>
-                                        <td class="red-col">${formatPercent(selectedUserDetails.plannedWorkNotDoneOnTime)}</td>
                                         <td class="red-col">${selectedUserDetails.commitment || 0}</td>
                                     </tr>
                                 `}).join('')}

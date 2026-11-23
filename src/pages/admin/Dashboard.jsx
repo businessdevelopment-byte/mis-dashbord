@@ -80,11 +80,7 @@ const AdminDashboard = () => {
     { key: "allPending", label: columnLabels.allPending },
     { key: "workDoneOnTime", label: columnLabels.workDoneOnTime },
     { key: "workNotDoneOnTime", label: columnLabels.workNotDoneOnTime },
-    { key: "lastWeekPlannedNotDone", label: "Last Week Planned Work Not Done %" },
-    { key: "lastWeekPlannedNotDoneOnTime", label: "Last Week Planned Work Not Done On Time %" },
     { key: "lastWeekCommitment", label: "Last Week Commitment" },
-    { key: "nextWeekPlannedNotDone", label: columnLabels.nextWeekPlannedNotDone },
-    { key: "nextWeekPlannedNotDoneOnTime", label: columnLabels.nextWeekPlannedNotDoneOnTime },
     { key: "nextWeekCommitment", label: columnLabels.nextWeekCommitment },
   ];
 
@@ -1064,8 +1060,8 @@ Here is your performance summary:
 
 Please review your performance and ensure timely completion of pending tasks.
 
-Best regards,  
-CHANDHOK.`;
+Best regards,
+VSNAPU.`;
 
         const phone = emp.email || "";
         const cleanPhone = phone.replace(/\D/g, "");
