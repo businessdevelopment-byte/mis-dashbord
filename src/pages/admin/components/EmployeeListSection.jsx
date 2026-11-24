@@ -237,29 +237,9 @@ const EmployeeListSection = ({
                                     {columnLabels.workNotDoneOnTime}
                                 </th>
                             )}
-                            {visibleColumns.lastWeekPlannedNotDone && (
-                                <th className="px-2 min-w-24 text-center py-3  text-xs font-bold uppercase tracking-wider bg-red-100 text-red-700">
-                                    Planned % Work Not Done
-                                </th>
-                            )}
-                            {visibleColumns.lastWeekPlannedNotDoneOnTime && (
-                                <th className="px-2 min-w-24 text-center py-3  text-xs font-bold uppercase tracking-wider bg-red-100 text-red-700">
-                                    Planned % Work Not Done On Time
-                                </th>
-                            )}
                             {visibleColumns.lastWeekCommitment && (
                                 <th className="px-2 min-w-24 text-center py-3  text-xs font-bold uppercase tracking-wider bg-red-100 text-red-700">
                                     Commitment
-                                </th>
-                            )}
-                            {visibleColumns.nextWeekPlannedNotDone && (
-                                <th className="px-2  min-w-24 text-center py-3  text-xs font-bold uppercase tracking-wider bg-green-100 text-green-700">
-                                    Planned % Work Not Done
-                                </th>
-                            )}
-                            {visibleColumns.nextWeekPlannedNotDoneOnTime && (
-                                <th className="px-2 min-w-24 text-center py-3  text-xs font-bold uppercase tracking-wider bg-green-100 text-green-700">
-                                    Planned % Work Not Done On Time
                                 </th>
                             )}
                             {visibleColumns.nextWeekCommitment && (
@@ -390,63 +370,9 @@ const EmployeeListSection = ({
                                                 {employee.workNotDoneOnTime}
                                             </td>
                                         )}
-                                        {visibleColumns.lastWeekPlannedNotDone && (
-                                            <td className="px-3 py-4 whitespace-nowrap text-sm bg-red-50 text-red-800 font-medium text-center">
-                                                {employee.plannedWorkNotDone}
-                                            </td>
-                                        )}
-                                        {visibleColumns.lastWeekPlannedNotDoneOnTime && (
-                                            <td className="px-3 py-4 whitespace-nowrap text-sm bg-red-50 text-red-800 font-medium text-center">
-                                                {employee.plannedWorkNotDoneOnTime}
-                                            </td>
-                                        )}
                                         {visibleColumns.lastWeekCommitment && (
                                             <td className="px-3 py-4 whitespace-nowrap text-sm bg-red-50 text-red-800 font-medium text-center">
                                                 {employee.commitment}
-                                            </td>
-                                        )}
-                                        {visibleColumns.nextWeekPlannedNotDone && (
-                                            <td className="px-3 py-4 whitespace-nowrap bg-green-50 text-center">
-                                                {selectedEmployees.includes(employee.id) ? (
-                                                    <input
-                                                        type="text"
-                                                        placeholder="0"
-                                                        value={editableData[employee.id]?.nextWeekPlannedNotDone || ""}
-                                                        onChange={(e) =>
-                                                            handleInputChange(
-                                                                employee.id,
-                                                                "nextWeekPlannedNotDone",
-                                                                e.target.value
-                                                            )
-                                                        }
-                                                        className="w-16 px-2 py-1 border border-gray-300 rounded text-sm [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                                                        onClick={(e) => e.stopPropagation()}
-                                                    />
-                                                ) : (
-                                                    <span className="text-sm text-green-800 font-medium">{employee.nextWeekPlannedWorkNotDone || 0}</span>
-                                                )}
-                                            </td>
-                                        )}
-                                        {visibleColumns.nextWeekPlannedNotDoneOnTime && (
-                                            <td className="px-3 py-4 whitespace-nowrap bg-green-50 text-center">
-                                                {selectedEmployees.includes(employee.id) ? (
-                                                    <input
-                                                        type="text"
-                                                        placeholder="0"
-                                                        value={editableData[employee.id]?.nextWeekPlannedNotDoneOnTime || ""}
-                                                        onChange={(e) =>
-                                                            handleInputChange(
-                                                                employee.id,
-                                                                "nextWeekPlannedNotDoneOnTime",
-                                                                e.target.value
-                                                            )
-                                                        }
-                                                        className="w-16 px-2 py-1 border border-gray-300 rounded text-sm [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                                                        onClick={(e) => e.stopPropagation()}
-                                                    />
-                                                ) : (
-                                                    <span className="text-sm text-green-800 font-medium">{employee.nextWeekPlannedWorkNotDoneOnTime || 0}</span>
-                                                )}
                                             </td>
                                         )}
                                         {visibleColumns.nextWeekCommitment && (
@@ -623,18 +549,6 @@ const EmployeeListSection = ({
                                                 Last Week Performance
                                             </p>
                                             <div className="grid grid-cols-2 gap-3 text-xs">
-                                                <div>
-                                                    <p className="text-red-600 font-medium">% Work Not Done</p>
-                                                    <p className="text-sm font-bold text-red-800">
-                                                        {employee.plannedWorkNotDone || 0}
-                                                    </p>
-                                                </div>
-                                                <div>
-                                                    <p className="text-red-600 font-medium">Not Done On Time</p>
-                                                    <p className="text-sm font-bold text-red-800">
-                                                        {employee.plannedWorkNotDoneOnTime || 0}
-                                                    </p>
-                                                </div>
                                                 <div className="col-span-2">
                                                     <p className="text-red-600 font-medium">Commitment</p>
                                                     <p className="text-sm font-bold text-red-800">
@@ -652,50 +566,6 @@ const EmployeeListSection = ({
 
                                             {selectedEmployees.includes(employee.id) ? (
                                                 <div className="space-y-3">
-                                                    <div>
-                                                        <label className="text-xs text-green-700 font-medium block mb-1">
-                                                            Work Not Done %
-                                                        </label>
-                                                        <input
-                                                            type="number"
-                                                            min="0"
-                                                            max="100"
-                                                            value={
-                                                                employeeCommitments[employee.id]
-                                                                    ?.nextWeekPlannedWorkNotDone || 0
-                                                            }
-                                                            onChange={(e) =>
-                                                                handleCommitmentChange(
-                                                                    employee.id,
-                                                                    "nextWeekPlannedWorkNotDone",
-                                                                    e.target.value
-                                                                )
-                                                            }
-                                                            className="w-full px-2 py-1.5 border border-green-200 rounded text-sm focus:ring-1 focus:ring-green-500 focus:border-green-500"
-                                                        />
-                                                    </div>
-                                                    <div>
-                                                        <label className="text-xs text-green-700 font-medium block mb-1">
-                                                            Work Not Done On Time %
-                                                        </label>
-                                                        <input
-                                                            type="number"
-                                                            min="0"
-                                                            max="100"
-                                                            value={
-                                                                employeeCommitments[employee.id]
-                                                                    ?.nextWeekPlannedWorkNotDoneOnTime || 0
-                                                            }
-                                                            onChange={(e) =>
-                                                                handleCommitmentChange(
-                                                                    employee.id,
-                                                                    "nextWeekPlannedWorkNotDoneOnTime",
-                                                                    e.target.value
-                                                                )
-                                                            }
-                                                            className="w-full px-2 py-1.5 border border-green-200 rounded text-sm focus:ring-1 focus:ring-green-500 focus:border-green-500"
-                                                        />
-                                                    </div>
                                                     <div>
                                                         <label className="text-xs text-green-700 font-medium block mb-1">
                                                             Commitment %
@@ -720,18 +590,6 @@ const EmployeeListSection = ({
                                                 </div>
                                             ) : (
                                                 <div className="grid grid-cols-2 gap-3 text-xs">
-                                                    <div>
-                                                        <p className="text-green-600 font-medium">% Work Not Done</p>
-                                                        <p className="text-sm font-bold text-green-800">
-                                                            {employee.nextWeekPlannedWorkNotDone || 0}
-                                                        </p>
-                                                    </div>
-                                                    <div>
-                                                        <p className="text-green-600 font-medium">Not Done On Time</p>
-                                                        <p className="text-sm font-bold text-green-800">
-                                                            {employee.nextWeekPlannedWorkNotDoneOnTime || 0}
-                                                        </p>
-                                                    </div>
                                                     <div className="col-span-2">
                                                         <p className="text-green-600 font-medium">Commitment</p>
                                                         <p className="text-sm font-bold text-green-800">
